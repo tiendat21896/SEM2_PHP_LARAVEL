@@ -39,4 +39,5 @@ class Product extends Model {
     public function getProductUrl(){
         return url("/product/{$this->__get("slug")}");
     }
+
 }

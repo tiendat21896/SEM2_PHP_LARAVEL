@@ -20,5 +20,4 @@ class Brand extends Model
         }
         return asset($this->__get("brand_image"));
     }
-
 }
