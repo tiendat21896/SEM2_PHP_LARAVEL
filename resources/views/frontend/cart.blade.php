@@ -20,7 +20,7 @@
                         @foreach($products as $p)
                         <tr>
                             <td class="shoping__cart__item">
-                                <img src="{{$p->getImage()}}" alt="">
+                                <img width="100px" src="{{$p->getImage()}}" alt="">
                                 <h5>{{$p->__get("product_name")}}</h5>
                             </td>
                             <td class="shoping__cart__price">
@@ -42,7 +42,6 @@
                         </tr>
                         @endforeach
                         </tbody>
-
                     </table>
                 </div>
             </div>
