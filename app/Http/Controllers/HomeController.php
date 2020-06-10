@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Cart;
 use App\Category;
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Psy\Util\Str;
 use function GuzzleHttp\Psr7\str;
 
@@ -72,23 +75,59 @@ class HomeController extends Controller
         $qty = $request->has("qty")&& (int)$request->get("qty")>0?(int)$request->get("qty"):1;
         $myCart = session()->has("my_cart") && is_array(session("my_cart"))?session("my_cart"):[];
         $contain = false;
-        foreach ($myCart as $item){
-            if ($item["product_id"] == $product->__get("id")){
-                $item["qty"]+=$qty;
+        if(Auth::check()){
+            if(Cart::where("user_id",Auth::id())->where("is_checkout",true)->exists()){
+                $cart = Cart::where("user_id",Auth::id())->where("is_checkout",true)->first();
+            }else{
+                $cart = Cart::create([
+                    "user_id"=> Auth::id(),
+                    "is_checkout"=>true
+                ]);
+            }
+        }
+        foreach ($myCart as $key=>$item){
+            if($item["product_id"] == $product -> __get("id")){
+                $myCart[$key]["qty"] == $qty;
                 $contain = true;
+                if(Auth::check()) {
+                    DB::table("cart_product")->where("cart_id", $cart->__get("id"))
+                        ->where("product_id", $item["product_id"])
+                        ->update(["qty" => $myCart[$key]["qty"]]);
+                }
                 break;
             }
         }
-        if (!$contain){
+        if(!$contain){
             $myCart[] = [
-                "product_id" =>$product->__get("id"),
+                "product_id" => $product -> __get("id"),
                 "qty" => $qty
             ];
+            if(Auth::check()) {
+                DB::table("cart_product")->insert([
+                    "qty" => $qty,
+                    "cart_id" => $cart->__get("id"),
+                    "product_id" => $product->__get("id")
+                ]);
+            }
         }
         session(["my_cart"=>$myCart]);
+        if(Auth::check()){
+            if (Cart::where("user_id",Auth::id())->where("is_checkout",true)->exists()){
+                $cart = Cart::where("user_id",Auth::id()->where("is_checkout",true)->first());
+            }else{
+                $cart = Cart::create([
+                    "user_id"=> Auth::id(),
+                    "is_checkout"=>true
+                ]);
+            }
+            foreach ($myCart as $item){
+
+            }
+        }
         return redirect()->to("/shopping-cart");
         // return redirect va trang truoc
     }
+
 
     public function shoppingCart(){
         $myCart = session()->has("my_cart") && is_array(session("my_cart"))?session("my_cart"):[];
