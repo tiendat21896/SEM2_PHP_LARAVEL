@@ -77,18 +77,17 @@
                 <div class="header__cart">
                     @php
                         $myCart = session()->has("my_cart")?session("my_cart"):[];
-                        $count_item = count($myCart);
+                        $count_item  = count($myCart);
                         $productIds = [];
                         foreach ($myCart as $item){
                             $productIds[] = $item["product_id"];
                         }
                         $grandTotal = 0;
-                        $products = \App\Product::whereIn('id',$productIds);
+                        $products = \App\Product::find($productIds);
                         foreach ($products as $p){
                             foreach ($myCart as $item){
-                                if($p->__get("id") == $item["product_id"]){
+                                if($p->__get("id") == $item["product_id"])
                                     $grandTotal += ($p->__get("price")*$item["qty"]);
-                                }
                             }
                         }
                     @endphp
@@ -96,7 +95,7 @@
                         <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li>
                         <li><a href="#"><i class="fa fa-shopping-bag"></i> <span>{{$count_item}}</span></a></li>
                     </ul>
-                    <div class="header__cart__price">item: <span>$150.00</span></div>
+                    <div class="header__cart__price">item: <span>${{$grandTotal}}</span></div>
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@
                         </div>
                         <ul>
                             @foreach($categories as $category)
-                                <li><a href="#">{{$category->__get("category_name")}}</a></li>
+                                <li><a href="{{$category->getCategoryUrl()}}">{{$category->__get("category_name")}}</a></li>
                             @endforeach
                         </ul>
                     </div>
@@ -103,7 +103,7 @@
                                 </ul>
                             </div>
                             <div class="featured__item__text">
-                                <h6><a href="#">{{$f->__get("product_name")}}</a></h6>
+                                <h6><a href="javascript:void(0)">{{$f->__get("product_name")}}</a></h6>
                                 <h5>{{$f->getPrice()}}</h5>
                             </div>
                         </div>

@@ -41,21 +41,24 @@ class LoginController extends Controller
     }
     public function  authenticated(Request $request, $user)
     {
-        if (Cart::where("user_id",$user->__get("id"))->where("is_checkout",true)->exists()){
-            $myCart = session()->has("my_cart") && is_array(session("my_cart"));
-            $cart = Cart::where("user_id",$user->__get("id"))->where("is_checkout",true)->first();
-            $items = $cart ->getItems;
+        if(Cart::where("user_id",$user->__get("id"))
+            ->where("is_checkout",true)->exists()){
+            $myCart = session()->has("my_cart")&& is_array(session("my_cart"))?session("my_cart"):[];
+            $cart = Cart::where("user_id",$user->__get("id"))
+                ->where("is_checkout",true)->first();
+            $items=  $cart->getItems;
             foreach ($items as $item){
+                $contain = false;
                 foreach ($myCart as $key=>$c){
-                    if ($c["product_id"] == $item -> __get("id")){
-                        $myCart[$key]["qty"] += $item->__get("pivot_qty");
+                    if($c["product_id"] == $item->__get("id")){
+                        $myCart[$key]["qty"]+=$item->pivot->__get("qty");
                         $contain = true;
                     }
                 }
-                if (!$contain){
+                if(!$contain){
                     $myCart[] = [
-                        "product_id"=>$item->__get("id"),
-                        "qty"=> $item ->__get("pivot_qty")
+                        "product_id"=> $item->__get("id"),
+                        "qty"=> $item->pivot->__get("qty")
                     ];
                 }
             }
