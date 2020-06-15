@@ -8,9 +8,9 @@ use App\Events\OrderCreated;
 use App\Order;
 use App\Product;
 use Carbon\Carbon;
-use Illuminate\Filesystem\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Psy\Util\Str;
 use function GuzzleHttp\Psr7\str;
@@ -37,12 +37,14 @@ class HomeController extends Controller
             $p->save();
             // tuong duong $p->update(["slug"=>$slug.$p->__get("id")]);
         }
-        if (\Illuminate\Support\Facades\Cache::has("home_page")){
+        if (!Cache::has("home_page")){
+            $categories = Category::all();
             $most_view = Product::orderBy("viewer_count","DESC")->limit(8)->get();
             $featureds = Product::orderBy("updated_at","DESC")->limit(8)->get();
             $latest_1 = Product::orderBy("created_at","DESC")->limit(3)->get();
             $latest_2 = Product::orderBy("created_at","DESC")->offset(3)->limit(3)->get();
             $view =  view("frontend.home",[
+                "categories" => $categories,
                 "most_view"=>$most_view,
                 "featureds" =>$featureds,
                 "latest_1" => $latest_1,
@@ -51,7 +53,7 @@ class HomeController extends Controller
             $now = Carbon::now();
             Cache::put("home_page",$view,$now->addMinute(20));
         }
-        return \Illuminate\Support\Facades\Cache::get("home_page");
+        return Cache::get("home_page");
     }
 
     public function category(Category $category){
